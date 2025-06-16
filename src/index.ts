@@ -22,6 +22,7 @@ bot.on("chat", async (sender, message) => {
         try {
             bot.dismount();
         } catch {}
+        bot.chat("/home donkey")
         const donkey = bot.nearestEntity(entity => entity.entityType === bot.registry.entitiesByName.donkey.id && entity.position.distanceTo(bot.entity.position) < 4);
         if (donkey === null) {
             bot.whisper(sender, "No donkey found nearby.");
@@ -29,19 +30,7 @@ bot.on("chat", async (sender, message) => {
         }
         const donkeyPosition = donkey.position.clone();
 
-        const minecart = bot.nearestEntity(entity => entity.entityType === bot.registry.entitiesByName.minecart.id && entity.position.distanceTo(bot.entity.position) < 4);
-        if (minecart === null) {
-            bot.whisper(sender, "No minecart found nearby.");
-            return;
-        }
-        const button = bot.findBlock({
-            matching: block => block.name.includes("button"),
-            maxDistance: 4
-        })
-        if (button === null) {
-            bot.whisper(sender, "No button found nearby.");
-            return;
-        }
+        
         bot.whisper(sender, "Attempting to dupe...");
         
         const windowHandler = async (window: Window) => {
@@ -64,13 +53,16 @@ bot.on("chat", async (sender, message) => {
                             destEnd: 54
                         }).catch(console.log)
                     })
+                
+                
+                bot.dismount();
             }
         }
 
         bot.on("windowOpen", windowHandler);
 
         bot.setControlState("sneak", true);
-        await bot.waitForTicks(5);
+        await bot.waitForTicks(60);
         
         try {
             bot.mount(donkey);
@@ -78,11 +70,17 @@ bot.on("chat", async (sender, message) => {
         await bot.waitForTicks(3);
 
         bot.setControlState("sneak", false);
-        await bot.waitForTicks(5);
         
-        await bot.activateBlock(button);   
-        bot.mount(minecart);
-        
+        bot.chat("/home awaydonkey")
+        await bot.waitForTicks(10);
+        const minecart = bot.nearestEntity(entity => entity.entityType === bot.registry.entitiesByName.minecart.id && entity.position.distanceTo(bot.entity.position) < 4);
+        if (minecart === null) {
+            bot.whisper(sender, "No minecart found nearby.");
+            return;
+        }
+
+        bot.mount(minecart)
+
     } else if (message.startsWith("!dismount")) {
         try {
             bot.dismount();
@@ -91,3 +89,6 @@ bot.on("chat", async (sender, message) => {
         }
     }
 })
+
+bot.once("kicked", console.log);
+bot.once("error", console.log);
