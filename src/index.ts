@@ -1,5 +1,7 @@
 import { Chest, createBot } from "mineflayer";
 import { Window } from "prismarine-windows";
+import { setTimeout as sleep } from "timers/promises";
+
 const bot = createBot({
     host: "8b8t.me", 
     port: 25565, 
@@ -46,8 +48,8 @@ bot.on("chat", async (sender, message) => {
             if (window.type === "minecraft:generic_9x2") {
                 console.log(window)
                 bot.removeListener("windowOpen", windowHandler)
-                while (bot.entity.position.distanceTo(donkeyPosition) < 128) {
-                    await bot.waitForTicks(1);
+                while (donkeyPosition.distanceTo(bot.entity.vehicle.position) < 128) {
+                    await sleep(100)
                 }
                 console.log("transferring items")
                 window.containerItems().forEach(item => {
@@ -81,14 +83,11 @@ bot.on("chat", async (sender, message) => {
         await bot.activateBlock(button);   
         bot.mount(minecart);
         
-    } else if (message.startsWith("!test")) {
-        const donkey = bot.nearestEntity(entity => entity.entityType === bot.registry.entitiesByName.donkey.id && entity.position.distanceTo(bot.entity.position) < 4);
-        if (donkey === null) {
-            bot.whisper(sender, "No donkey found nearby.");
-            return;
+    } else if (message.startsWith("!dismount")) {
+        try {
+            bot.dismount();
+        } catch {
+            bot.whisper(sender, "Failed to dismount.");
         }
-        bot.setControlState("sneak", true);
-        await bot.waitForTicks(5);
-        bot.mount(donkey);
     }
 })
