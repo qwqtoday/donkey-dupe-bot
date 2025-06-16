@@ -40,20 +40,18 @@ bot.on("chat", async (sender, message) => {
                 while (donkeyPosition.distanceTo(bot.entity.vehicle.position) < 128) {
                     await sleep(100)
                 }
-                console.log("transferring items")
-                window.containerItems().forEach(item => {
-                        bot.transfer({
-                            window: window, 
-                            itemType: item.type,
-                            count: item.count,
-                            metadata: null,
-                            sourceStart: 0,
-                            sourceEnd: 17,
-                            destStart: 18,
-                            destEnd: 54
-                        }).catch(console.log)
+                for (const item of window.containerItems()) {
+                    await bot.transfer({
+                        window: window, 
+                        itemType: item.type,
+                        count: item.count,
+                        metadata: null,
+                        sourceStart: 0,
+                        sourceEnd: 17,
+                        destStart: 18,
+                        destEnd: 54
                     })
-                
+                }
                 
                 bot.dismount();
             }
@@ -62,7 +60,7 @@ bot.on("chat", async (sender, message) => {
         bot.on("windowOpen", windowHandler);
 
         bot.setControlState("sneak", true);
-        await bot.waitForTicks(60);
+        await bot.waitForTicks(10);
         
         try {
             bot.mount(donkey);
